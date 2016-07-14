@@ -25,7 +25,7 @@ describe ProjectStore::Base do
 
   it 'should allow to save any entity' do
     subject.project_entities.values.each do |entity|
-      expect {entity.save}.not_to raise_error PSE
+      expect {entity.save}.not_to raise_error
     end
   end
 

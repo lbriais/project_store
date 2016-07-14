@@ -5,26 +5,24 @@ module ProjectStore
 
   module Editing
 
-    def editor=(editor)
-      raise PSE, "Invalid editor specified '#{editor}'" unless File.executable? editor
-      @editor = editor
-    end
+    attr_writer :editor
 
     def editor
       @editor ||= ENV['EDITOR']
-      raise PSE, 'No editor specified' if @editor.nil?
-      raise PSE, 'No valid editor specified' unless File.executable? @editor
-      @editor
     end
 
     def edit(file_or_entity)
       file =  case file_or_entity
                 when String
-                  file_or_entity
+                  if File.exists? file_or_entity and File.readable? file_or_entity
+                    file_or_entity
+                  else
+                    raise PSE, "Invalid file to edit '#{file_or_entity}'"
+                  end
                 when ProjectStore::Entity::Base
                   file_or_entity.backing_store.path
               end
-      tmp_file = Tempfile.new(self.class.name)
+      tmp_file = Tempfile.new(self.class.name).path
       begin
         FileUtils.copy file, tmp_file
         edit_file tmp_file
@@ -43,7 +41,7 @@ module ProjectStore
           raise PSE, 'Invalid modifications. Aborted !'
         end
       ensure
-        tmp_file.unlink
+        File.unlink tmp_file
       end
 
     end
@@ -51,6 +49,8 @@ module ProjectStore
     private
 
     def edit_file(file)
+      raise PSE, 'No editor specified' if editor.nil?
+      logger.debug "Editing file '#{file}', using editor '#{editor}'"
       `"#{editor}" "#{file}"`
     end
 
