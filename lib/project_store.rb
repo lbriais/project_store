@@ -3,15 +3,12 @@ require 'logger'
 
 require 'project_store/version'
 require 'project_store/error'
+require 'project_store/utils/basic_logger'
 
 module ProjectStore
-  def self.logger
-    @logger ||= Logger.new STDOUT
-  end
 
-  def self.logger=(logger)
-    @logger = logger
-  end
+  extend ProjectStore::Utils::BasicLogger
+
 end
 
 
