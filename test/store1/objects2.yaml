@@ -1,6 +1,6 @@
 ---
-type1:
-  :name: another_object
+another object:
+  :type: type 1
   :a: :val_a
   :b:
   - 1

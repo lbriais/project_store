@@ -1,13 +1,13 @@
 ---
-type1:
-  :name: object 1
+object 1:
+  :type: type 1
   :a: :val_a
   :b:
   - 1
   - 2
   - 3
-type2:
-  :name: object 2
+object 2:
+  :type: type 2
   :a: :val_a
   :b:
   - 1
