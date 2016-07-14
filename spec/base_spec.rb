@@ -18,4 +18,19 @@ describe ProjectStore::Base do
     expect(subject.entity_types.keys.size).to eq 2
   end
 
+  it 'should index objects by stores' do
+    expect(subject.stores.keys.size).to eq 2
+  end
+
+  context 'when the stores contains duplicated objects' do
+
+    let(:store) { File.expand_path '../../test/store2', __FILE__ }
+    subject {described_class.new store}
+
+    it 'should raise an exception by default' do
+      expect {subject.load_entities}.to raise_error
+    end
+
+  end
+
 end

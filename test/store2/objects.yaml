@@ -1,0 +1,15 @@
+---
+type1:
+  :name: object 1
+  :a: :val_a
+  :b:
+  - 1
+  - 2
+  - 3
+type2:
+  :name: object 1
+  :a: :val_a
+  :b:
+  - 1
+  - 2
+  - 3

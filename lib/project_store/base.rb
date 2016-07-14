@@ -12,7 +12,7 @@ module ProjectStore
       raise "Invalid store path '#{path}'!" unless valid_path? path
       @logger = Logger.new STDOUT
       @path = File.expand_path path
-      @continue_on_error = true
+      @continue_on_error = false
       @project_entities = {}
       @stores = {}
       @entity_types = {}
@@ -32,7 +32,10 @@ module ProjectStore
                 entity.extend ProjectStore::BasicEntity
                 entity.basic_checks
                 logger.info "Found '#{entity.name}' of type '#{entity_type}'."
+                raise "Entity '#{entity.name}' already defined in file '#{project_entities[entity.name].backing_store}'" if project_entities[entity.name]
+                entity.backing_store = file
                 project_entities[entity.name] = entity
+
                 entity_types[entity_type] ||= []
                 entity_types[entity_type] << entity
                 stores[file] << entity
