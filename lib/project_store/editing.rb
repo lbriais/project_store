@@ -12,6 +12,7 @@ module ProjectStore
 
     def editor
       @editor ||= ENV['EDITOR']
+      raise PSE, 'No editor specified' if @editor.nil?
       raise PSE, 'No valid editor specified' unless File.executable? @editor
       @editor
     end
@@ -32,7 +33,6 @@ module ProjectStore
           store.transaction do
             store.roots.each do |entity_type|
               store[entity_type]
-              raise
             end
           end
           FileUtils.copy tmp_file, file
@@ -51,9 +51,7 @@ module ProjectStore
     private
 
     def edit_file(file)
-
       `"#{editor}" "#{file}"`
-
     end
 
 

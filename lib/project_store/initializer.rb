@@ -1,10 +1,15 @@
+require 'fileutils'
+
 module ProjectStore
 
   module Initializer
 
 
-    private
+    def self.setup(path = Dir.pwd)
+      FileUtils.mkpath path
+    end
 
+    private
 
     def find_store_dir(dir_basename, from_dir)
       raise "Invalid directory '#{from_dir}'" unless Dir.exist?(from_dir) and File.readable?(from_dir)

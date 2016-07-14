@@ -2,11 +2,11 @@ require 'spec_helper'
 
 describe ProjectStore::Base do
 
-  let(:store) { File.expand_path '../../test/store1', __FILE__ }
-  let(:bad_store) { File.expand_path '../../test/no_store', __FILE__ }
+  let(:store_path) { File.expand_path '../../test/store1', __FILE__ }
+  let(:bad_store_path) { File.expand_path '../../test/no_store', __FILE__ }
 
   subject do
-    o = described_class.new store
+    o = described_class.new store_path
     o.load_entities
     o
   end
@@ -35,7 +35,7 @@ describe ProjectStore::Base do
 
     it 'should raise an exception' do
       expect do
-        subject.new bad_store
+        subject.new bad_store_path
       end .to raise_error ProjectStore::Error
     end
 
@@ -43,8 +43,8 @@ describe ProjectStore::Base do
 
   context 'when the stores contain duplicated objects' do
 
-    let(:store) { File.expand_path '../../test/store2', __FILE__ }
-    subject {described_class.new store}
+    let(:store_path) { File.expand_path '../../test/store2', __FILE__ }
+    subject {described_class.new store_path}
 
     it 'should raise an exception by default' do
       expect {subject.load_entities}.to raise_error PSE
