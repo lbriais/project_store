@@ -51,7 +51,7 @@ module ProjectStore
     end
 
     def add_and_index_entity(entity, store, entity_type)
-      entity.extend ProjectStore::BasicEntity
+      entity.extend ProjectStore::Entity::Base
       entity.basic_checks
       logger.info "Found '#{entity.name}' of type '#{entity_type}'."
       raise "Entity '#{entity.name}' already defined in file '#{project_entities[entity.name].backing_store.path}'" if project_entities[entity.name]

@@ -2,7 +2,9 @@ require 'yaml/store'
 require 'logger'
 
 require 'project_store/version'
-require 'project_store/basic_entity'
+require 'project_store/entity/mandatory_properties'
+require 'project_store/entity/common_properties'
+require 'project_store/entity/base'
 require 'project_store/base'
 
 module ProjectStore
