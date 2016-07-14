@@ -4,11 +4,13 @@ module ProjectStore
 
   class Base
 
+    include ProjectStore::Editing
+
     attr_accessor :continue_on_error
     attr_reader :path, :project_entities, :entity_types, :stores, :logger
 
     def initialize(path)
-      raise "Invalid store path '#{path}'!" unless valid_path? path
+      raise PSE, "Invalid store path '#{path}'!" unless valid_path? path
       @logger = ProjectStore.logger
       @path = File.expand_path path
       @continue_on_error = false
@@ -30,9 +32,13 @@ module ProjectStore
                 entity = store[entity_type]
                 add_and_index_entity entity, store, entity_type
               rescue => e
-                logger.error "Invalid entity of type '#{entity_type}' in file '#{file}'"
-                logger.debug "#{e.message}\nBacktrace:\n#{e.backtrace.join("\n\t")}"
-                raise unless continue_on_error
+                if continue_on_error
+                  logger.error "Invalid entity of type '#{entity_type}' in file '#{file}'"
+                  logger.debug "#{e.message}\nBacktrace:\n#{e.backtrace.join("\n\t")}"
+                else
+                  logger.debug "#{e.message}\nBacktrace:\n#{e.backtrace.join("\n\t")}"
+                  raise PSE, "Invalid entity of type '#{entity_type}' in file '#{file}'"
+                end
               end
             end
           end
@@ -54,7 +60,7 @@ module ProjectStore
       entity.extend ProjectStore::Entity::Base
       entity.basic_checks
       logger.info "Found '#{entity.name}' of type '#{entity_type}'."
-      raise "Entity '#{entity.name}' already defined in file '#{project_entities[entity.name].backing_store.path}'" if project_entities[entity.name]
+      raise PSE, "Entity '#{entity.name}' already defined in file '#{project_entities[entity.name].backing_store.path}'" if project_entities[entity.name]
       entity.backing_store = store
       project_entities[entity.name] = entity
       entity_types[entity_type] ||= []

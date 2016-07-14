@@ -3,6 +3,7 @@ require 'spec_helper'
 describe ProjectStore::Base do
 
   let(:store) { File.expand_path '../../test/store1', __FILE__ }
+  let(:bad_store) { File.expand_path '../../test/no_store', __FILE__ }
 
   subject do
     o = described_class.new store
@@ -24,8 +25,20 @@ describe ProjectStore::Base do
 
   it 'should allow to save any entity' do
     subject.project_entities.values.each do |entity|
-      expect {entity.save}.not_to raise_error
+      expect {entity.save}.not_to raise_error PSE
     end
+  end
+
+  context 'when initialized with a non-existing path' do
+
+    subject {described_class}
+
+    it 'should raise an exception' do
+      expect do
+        subject.new bad_store
+      end .to raise_error ProjectStore::Error
+    end
+
   end
 
   context 'when the stores contain duplicated objects' do
@@ -34,12 +47,12 @@ describe ProjectStore::Base do
     subject {described_class.new store}
 
     it 'should raise an exception by default' do
-      expect {subject.load_entities}.to raise_error
+      expect {subject.load_entities}.to raise_error PSE
     end
 
     it 'should be possible to skip entities with issues' do
       subject.continue_on_error = true
-      expect {subject.load_entities}.not_to raise_error
+      expect {subject.load_entities}.not_to raise_error PSE
     end
 
   end
