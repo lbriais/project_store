@@ -54,7 +54,7 @@ module ProjectStore
       entity.extend ProjectStore::BasicEntity
       entity.basic_checks
       logger.info "Found '#{entity.name}' of type '#{entity_type}'."
-      raise "Entity '#{entity.name}' already defined in file '#{project_entities[entity.name].backing_store}'" if project_entities[entity.name]
+      raise "Entity '#{entity.name}' already defined in file '#{project_entities[entity.name].backing_store.path}'" if project_entities[entity.name]
       entity.backing_store = store
       project_entities[entity.name] = entity
       entity_types[entity_type] ||= []

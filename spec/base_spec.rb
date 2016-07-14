@@ -28,13 +28,18 @@ describe ProjectStore::Base do
     end
   end
 
-  context 'when the stores contains duplicated objects' do
+  context 'when the stores contain duplicated objects' do
 
     let(:store) { File.expand_path '../../test/store2', __FILE__ }
     subject {described_class.new store}
 
     it 'should raise an exception by default' do
       expect {subject.load_entities}.to raise_error
+    end
+
+    it 'should be possible to skip entities with issues' do
+      subject.continue_on_error = true
+      expect {subject.load_entities}.not_to raise_error
     end
 
   end
