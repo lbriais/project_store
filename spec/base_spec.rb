@@ -22,6 +22,12 @@ describe ProjectStore::Base do
     expect(subject.stores.keys.size).to eq 2
   end
 
+  it 'should allow to save any entity' do
+    subject.project_entities.values.each do |entity|
+      expect {entity.save}.not_to raise_error
+    end
+  end
+
   context 'when the stores contains duplicated objects' do
 
     let(:store) { File.expand_path '../../test/store2', __FILE__ }
@@ -32,5 +38,7 @@ describe ProjectStore::Base do
     end
 
   end
+
+
 
 end
