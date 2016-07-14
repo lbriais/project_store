@@ -28,7 +28,7 @@ module ProjectStore
               begin
                 logger.debug "Loading a '#{entity_type}' entity type."
                 entity = store[entity_type]
-                add_entity entity, store, entity_type
+                add_and_index_entity entity, store, entity_type
               rescue => e
                 logger.error "Invalid entity of type '#{entity_type}' in file '#{file}'"
                 logger.debug "#{e.message}\nBacktrace:\n#{e.backtrace.join("\n\t")}"
@@ -50,7 +50,7 @@ module ProjectStore
       Dir.exist? path and File.readable? path and File.writable? path
     end
 
-    def add_entity(entity, store, entity_type)
+    def add_and_index_entity(entity, store, entity_type)
       entity.extend ProjectStore::BasicEntity
       entity.basic_checks
       logger.info "Found '#{entity.name}' of type '#{entity_type}'."

@@ -51,6 +51,7 @@ module ProjectStore
       raise "Invalid entity '#{name}'. Forbidden 'backing_store' entry" if self[:backing_store]
       raise "Invalid entity '#{name}'. Forbidden 'basic_checks' entry" if self[:basic_checks]
       raise "Invalid entity '#{name}'. Forbidden 'save' entry" if self[:save]
+      raise "Invalid entity '#{name}'. Forbidden 'internal_type' entry" if self[:internal_type]
     end
 
 
