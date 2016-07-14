@@ -22,7 +22,8 @@ module ProjectStore
 
       def basic_checks
         raise PSE, 'Invalid entity. Missing name' unless name
-        raise PSE, 'Invalid entity. Missing type' unless type
+        raise PSE, 'Invalid entity. You should not specify a name as it would not be teken in account' if self[:name]
+        raise PSE, "Invalid entity '#{name}'. Missing type" unless type
         raise PSE, "Invalid entity '#{name}'. Forbidden 'backing_store' entry" if self[:backing_store]
         raise PSE, "Invalid entity '#{name}'. Forbidden 'basic_checks' entry" if self[:basic_checks]
         raise PSE, "Invalid entity '#{name}'. Forbidden 'save' entry" if self[:save]
