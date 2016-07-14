@@ -52,7 +52,7 @@ describe ProjectStore::Base do
 
     it 'should be possible to skip entities with issues' do
       subject.continue_on_error = true
-      expect {subject.load_entities}.not_to raise_error PSE
+      expect {subject.load_entities}.not_to raise_error
     end
 
   end

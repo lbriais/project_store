@@ -5,28 +5,24 @@ module ProjectStore
 
       include ProjectStore::Entity::MandatoryProperties
 
-      attr_reader :backing_store, :internal_type
+      attr_reader :backing_store
 
       def backing_store=(store)
         raise PSE, 'Cannot change the store for an entity' if @backing_store
         @backing_store = store
       end
 
-      def internal_type=(type)
-        raise PSE, 'Cannot change the type for an entity' if @internal_type
-        @internal_type = type
-      end
-
       def save
         ProjectStore.logger.info "Saving '#{name}' into '#{backing_store.path}'"
         backing_store.transaction do
-          backing_store[internal_type] = self
+          backing_store[name] = self
         end
       end
 
 
       def basic_checks
         raise PSE, 'Invalid entity. Missing name' unless name
+        raise PSE, 'Invalid entity. Missing type' unless type
         raise PSE, "Invalid entity '#{name}'. Forbidden 'backing_store' entry" if self[:backing_store]
         raise PSE, "Invalid entity '#{name}'. Forbidden 'basic_checks' entry" if self[:basic_checks]
         raise PSE, "Invalid entity '#{name}'. Forbidden 'save' entry" if self[:save]

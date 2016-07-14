@@ -3,12 +3,14 @@ module ProjectStore
 
     module MandatoryProperties
 
-      def name
-        self[:name]
+      attr_accessor :name
+
+      def type
+        self[:type]
       end
 
-      def name=(name)
-        self[:name] = name
+      def type=(type)
+        self[:type] = type
       end
 
     end

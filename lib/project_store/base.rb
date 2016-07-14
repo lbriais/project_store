@@ -26,18 +26,18 @@ module ProjectStore
           store = YAML::Store.new(file)
           stores[store] ||= []
           store.transaction(true) do
-            store.roots.each do |entity_type|
+            store.roots.each do |entity_name|
               begin
-                logger.debug "Loading a '#{entity_type}' entity type."
-                entity = store[entity_type]
-                add_and_index_entity entity, store, entity_type
+                logger.debug "Loading '#{entity_name}' entity."
+                entity = store[entity_name]
+                add_and_index_entity entity, store, entity_name
               rescue => e
                 if continue_on_error
-                  logger.error "Invalid entity of type '#{entity_type}' in file '#{file}'"
+                  logger.error "Invalid entity of type '#{entity_name}' in file '#{file}'"
                   logger.debug "#{e.message}\nBacktrace:\n#{e.backtrace.join("\n\t")}"
                 else
                   logger.debug "#{e.message}\nBacktrace:\n#{e.backtrace.join("\n\t")}"
-                  raise PSE, "Invalid entity of type '#{entity_type}' in file '#{file}'"
+                  raise PSE, "Invalid entity of type '#{entity_name}' in file '#{file}'"
                 end
               end
             end
@@ -56,16 +56,16 @@ module ProjectStore
       Dir.exist? path and File.readable? path and File.writable? path
     end
 
-    def add_and_index_entity(entity, store, entity_type)
+    def add_and_index_entity(entity, store, entity_name)
       entity.extend ProjectStore::Entity::Base
+      entity.name = entity_name
       entity.basic_checks
-      logger.info "Found '#{entity.name}' of type '#{entity_type}'."
+      logger.info "Found '#{entity.name}' of type '#{entity.type}'."
       raise PSE, "Entity '#{entity.name}' already defined in file '#{project_entities[entity.name].backing_store.path}'" if project_entities[entity.name]
       entity.backing_store = store
       project_entities[entity.name] = entity
-      entity_types[entity_type] ||= []
-      entity_types[entity_type] << entity
-      entity.internal_type = entity_type
+      entity_types[entity.type] ||= []
+      entity_types[entity.type] << entity
       stores[store] << entity
     end
 
