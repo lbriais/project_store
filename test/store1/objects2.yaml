@@ -1,0 +1,8 @@
+---
+type1:
+  :name: another_object
+  :a: :val_a
+  :b:
+  - 1
+  - 2
+  - 3
