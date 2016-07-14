@@ -26,21 +26,33 @@ module ProjectStore
       tmp_file = Tempfile.new(self.class.name)
       begin
         FileUtils.copy file, tmp_file
-        `"#{editor}" "#{tmp_file}"`
+        edit_file tmp_file
         begin
           store = YAML::Store.new(tmp_file)
-          store.transaction(true) do
+          store.transaction do
             store.roots.each do |entity_type|
               store[entity_type]
+              raise
             end
           end
           FileUtils.copy tmp_file, file
-        rescue
-          logger.error 'Invalid modifications. Aborted !'
+          logger.info "File '#{file}' updated successfully."
+          file
+        rescue => e
+          logger.debug "#{e.message}\nBacktrace:\n#{e.backtrace.join("\n\t")}"
+          raise PSE, 'Invalid modifications. Aborted !'
         end
       ensure
         tmp_file.unlink
       end
+
+    end
+
+    private
+
+    def edit_file(file)
+
+      `"#{editor}" "#{file}"`
 
     end
 
