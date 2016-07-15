@@ -6,7 +6,7 @@ module ProjectStore
 
     include ProjectStore::Editing
 
-    attr_accessor :continue_on_error
+    attr_accessor :continue_on_error, :decorators
     attr_reader :path, :project_entities, :entity_types, :stores, :logger
 
     def initialize(path)
@@ -17,6 +17,7 @@ module ProjectStore
       @project_entities = {}
       @stores = {}
       @entity_types = {}
+      @decorators = {}
     end
 
     def load_entities
@@ -62,6 +63,8 @@ module ProjectStore
       entity.basic_checks
       logger.info "Found '#{entity.name}' of type '#{entity.type}'."
       raise PSE, "Entity '#{entity.name}' already defined in file '#{project_entities[entity.name].backing_store.path}'" if project_entities[entity.name]
+      # Adds extra decorator
+      add_decorators entity
       entity.backing_store = store
       # Add to the store index store -> entity list
       stores[store] << entity
@@ -73,6 +76,19 @@ module ProjectStore
     end
 
 
+    def add_decorators(entity)
+      case decorators[entity.type]
+        when Array
+          decorators[entity.type]
+        when NilClass
+          []
+        else
+          [decorators[entity.type]]
+      end .each do |decorator|
+        entity.extend decorator
+        logger.debug "Decorated entity '#{entity.name}' with '#{decorator}'"
+      end
+    end
 
   end
 
