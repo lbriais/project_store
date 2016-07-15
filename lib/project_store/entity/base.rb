@@ -4,7 +4,6 @@ module ProjectStore
     module Base
 
       include ProjectStore::Entity::MandatoryProperties
-      include ProjectStore::Entity::CommonProperties
 
       attr_reader :backing_store
 
