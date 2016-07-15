@@ -3,21 +3,9 @@ module ProjectStore
 
     module CommonProperties
 
-      def description
-        self[:description]
-      end
+      extend ProjectStore::Entity::PropertyBinder
 
-      def description=(description)
-        self[:description] = description
-      end
-
-      def data
-        self[:data]
-      end
-
-      def data=(data)
-        self[:data] = data
-      end
+      yaml_accessor :description, :data
 
     end
 

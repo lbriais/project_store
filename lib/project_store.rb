@@ -11,7 +11,7 @@ module ProjectStore
 
 end
 
-
+require 'project_store/entity/properties_binder'
 require 'project_store/entity/mandatory_properties'
 require 'project_store/entity/common_properties'
 require 'project_store/entity/base'

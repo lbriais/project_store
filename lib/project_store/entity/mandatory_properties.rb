@@ -3,15 +3,10 @@ module ProjectStore
 
     module MandatoryProperties
 
+      extend ProjectStore::Entity::PropertyBinder
+
       attr_accessor :name
-
-      def type
-        self[:type]
-      end
-
-      def type=(type)
-        self[:type] = type
-      end
+      yaml_accessor :type
 
     end
 

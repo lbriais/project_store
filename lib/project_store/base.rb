@@ -63,10 +63,13 @@ module ProjectStore
       logger.info "Found '#{entity.name}' of type '#{entity.type}'."
       raise PSE, "Entity '#{entity.name}' already defined in file '#{project_entities[entity.name].backing_store.path}'" if project_entities[entity.name]
       entity.backing_store = store
+      # Add to the store index store -> entity list
+      stores[store] << entity
+      # Add to main hash entity name -> entity
       project_entities[entity.name] = entity
+      # Add to type hash  entity type -> entity list
       entity_types[entity.type] ||= []
       entity_types[entity.type] << entity
-      stores[store] << entity
     end
 
 
