@@ -13,7 +13,9 @@ module ProjectStore
       def yaml_reader(*args)
         args.each do |arg|
           self.class_eval do
-            define_method(arg) {self[arg]}
+            define_method arg do
+              self[arg]
+            end
           end
         end
       end
@@ -21,7 +23,7 @@ module ProjectStore
       def yaml_writer(*args)
         args.each do |arg|
           self.class_eval do
-            define_method("#{arg}=") do |val|
+            define_method "#{arg}=" do |val|
               self[arg] = val
             end
           end
