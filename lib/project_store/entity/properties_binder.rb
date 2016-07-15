@@ -22,19 +22,9 @@ module ProjectStore
         args.each do |arg|
           self.class_eval do
             define_method("#{arg}=") do |val|
-              if self.respond_to? :backing_store
-                backing_store.transaction do
-                  self[arg] = val
-                end
-                ProjectStore.logger.debug "Property '#{arg}' is persisted"
-              else
-                self[arg] = val
-                ProjectStore.logger.warn "Property '#{arg}' is modified but not persisted"
-              end
-
+              self[arg] = val
             end
           end
-
         end
       end
 
