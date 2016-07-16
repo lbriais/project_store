@@ -4,6 +4,7 @@ require 'logger'
 require 'project_store/version'
 require 'project_store/error'
 require 'project_store/utils/basic_logger'
+require 'project_store/initializer'
 
 module ProjectStore
 
