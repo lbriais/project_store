@@ -77,16 +77,18 @@ module ProjectStore
 
 
     def add_decorators(entity)
-      case decorators[entity.type]
-        when Array
-          decorators[entity.type]
-        when NilClass
-          []
-        else
-          [decorators[entity.type]]
-      end .each do |decorator|
-        entity.extend decorator
-        logger.debug "Decorated entity '#{entity.name}' with '#{decorator}'"
+      [:_default, entity.type].each do |decorators_key|
+        case decorators[decorators_key]
+          when Array
+            decorators[decorators_key]
+          when NilClass
+            []
+          else
+            [decorators[decorators_key]]
+        end .each do |decorator|
+          entity.extend decorator
+          logger.debug "Decorated entity '#{entity.name}' with '#{decorator}'"
+        end
       end
     end
 
