@@ -89,7 +89,7 @@ module ProjectStore
             [decorators[decorators_key]]
         end .each do |decorator|
           entity.extend decorator
-          entity.mandatory_properties.concat decorator.mandatory_properties
+          entity.mandatory_properties.concat decorator.mandatory_properties if decorator.mandatory_properties
           logger.debug "Decorated entity '#{entity.name}' with '#{decorator}'"
         end
       end
