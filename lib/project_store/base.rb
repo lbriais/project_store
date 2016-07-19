@@ -65,6 +65,8 @@ module ProjectStore
       raise PSE, "Entity '#{entity.name}' already defined in file '#{project_entities[entity.name].backing_store.path}'" if project_entities[entity.name]
       # Adds extra decorator
       add_decorators entity
+      # Re-check the validity of the object now that it has been decorated
+      entity.valid?(raise_exception: true)
       entity.backing_store = store
       # Add to the store index store -> entity list
       stores[store] << entity
@@ -87,6 +89,7 @@ module ProjectStore
             [decorators[decorators_key]]
         end .each do |decorator|
           entity.extend decorator
+          entity.mandatory_properties.concat decorator.mandatory_properties
           logger.debug "Decorated entity '#{entity.name}' with '#{decorator}'"
         end
       end
