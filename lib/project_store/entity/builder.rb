@@ -5,7 +5,7 @@ module ProjectStore
 
       attr_accessor :decorators
 
-      def setup_entity(entity_name, entity = {}, entity_type = nil)
+      def setup_entity!(entity_name, entity = {}, entity_type = nil)
         entity.extend ProjectStore::Entity::Base
         entity.name = entity_name
         entity.type = entity_type unless entity_type.nil?
@@ -13,6 +13,7 @@ module ProjectStore
         ProjectStore.logger.info "New entity '#{entity.name}' of type '#{entity.type}'."
         # Adds extra decorator
         add_decorators entity
+        entity
       end
 
       def add_decorators(entity)

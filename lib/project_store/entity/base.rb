@@ -14,7 +14,7 @@ module ProjectStore
 
       def save
         if backing_store.nil?
-          ProjectStore.logger.warn "No backing store specified for '#{name}'"
+          ProjectStore.logger.warn "No backing store specified for '#{name}'. Not saved!"
           return false
         end
         valid? raise_exception: true

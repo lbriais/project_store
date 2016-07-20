@@ -59,18 +59,18 @@ module ProjectStore
       Dir.exist? path and File.readable? path and File.writable? path
     end
 
-    def decorate_and_index_entity(entity_name, entity, store_name)
-      setup_entity entity_name, entity
+    def decorate_and_index_entity(entity_name, entity, store)
+      setup_entity! entity_name, entity
       # Re-check the validity of the object now that it has been decorated
       entity.valid?(raise_exception: true)
-      index_entity(entity, store_name)
+      index_entity(entity, store)
     end
 
-    def index_entity(entity, store_name)
-      entity.backing_store = store_name
+    def index_entity(entity, store)
+      entity.backing_store = store
       raise PSE, "Entity '#{entity.name}' already defined in file '#{project_entities[entity.name].backing_store.path}'" if project_entities[entity.name]
       # Add to the store index store -> entity list
-      stores[store_name] << entity if self.respond_to? :stores
+      stores[store] << entity
       # Add to main hash entity name -> entity
       project_entities[entity.name] = entity
       # Add to type hash  entity type -> entity list
