@@ -8,12 +8,17 @@ module ProjectStore
       attr_reader :backing_store
 
       def backing_store=(store)
-        raise PSE, 'Cannot change the store for an entity' if @backing_store
+        raise PSE, 'Cannot change the store for an entity' if backing_store
         @backing_store = store
       end
 
       def save
-        ProjectStore.logger.info "Saving '#{name}' into '#{backing_store.path}'"
+        if backing_store.nil?
+          ProjectStore.logger.warn "No backing store specified for '#{name}'"
+          return false
+        end
+        valid? raise_exception: true
+        ProjectStore.logger.debug "Saving '#{name}' into '#{backing_store.path}'"
         backing_store.transaction do
           backing_store[name] = self
         end

@@ -4,20 +4,21 @@ module ProjectStore
 
   class Base
 
+    include ProjectStore::Entity::Builder
     include ProjectStore::Editing
 
-    attr_accessor :continue_on_error, :decorators
+    attr_accessor :continue_on_error
     attr_reader :path, :project_entities, :entity_types, :stores, :logger
 
     def initialize(path)
       raise PSE, "Invalid store path '#{path}'!" unless valid_path? path
       @logger = ProjectStore.logger
       @path = File.expand_path path
-      @continue_on_error = false
+      self.continue_on_error = false
       @project_entities = {}
       @stores = {}
       @entity_types = {}
-      @decorators = {}
+      self.decorators = {}
     end
 
     def load_entities
@@ -31,7 +32,7 @@ module ProjectStore
               begin
                 logger.debug "Loading '#{entity_name}' entity."
                 entity = store[entity_name]
-                add_and_index_entity entity, store, entity_name
+                decorate_and_index_entity entity_name, entity, store
               rescue => e
                 if continue_on_error
                   logger.error "Invalid entity of type '#{entity_name}' in file '#{file}'"
@@ -51,25 +52,25 @@ module ProjectStore
       end
     end
 
+
     private
 
     def valid_path?(path)
       Dir.exist? path and File.readable? path and File.writable? path
     end
 
-    def add_and_index_entity(entity, store, entity_name)
-      entity.extend ProjectStore::Entity::Base
-      entity.name = entity_name
-      entity.basic_checks
-      logger.info "Found '#{entity.name}' of type '#{entity.type}'."
-      raise PSE, "Entity '#{entity.name}' already defined in file '#{project_entities[entity.name].backing_store.path}'" if project_entities[entity.name]
-      # Adds extra decorator
-      add_decorators entity
+    def decorate_and_index_entity(entity_name, entity, store_name)
+      setup_entity entity_name, entity
       # Re-check the validity of the object now that it has been decorated
       entity.valid?(raise_exception: true)
-      entity.backing_store = store
+      index_entity(entity, store_name)
+    end
+
+    def index_entity(entity, store_name)
+      entity.backing_store = store_name
+      raise PSE, "Entity '#{entity.name}' already defined in file '#{project_entities[entity.name].backing_store.path}'" if project_entities[entity.name]
       # Add to the store index store -> entity list
-      stores[store] << entity
+      stores[store_name] << entity if self.respond_to? :stores
       # Add to main hash entity name -> entity
       project_entities[entity.name] = entity
       # Add to type hash  entity type -> entity list
@@ -77,23 +78,6 @@ module ProjectStore
       entity_types[entity.type] << entity
     end
 
-
-    def add_decorators(entity)
-      [:_default, entity.type].each do |decorators_key|
-        case decorators[decorators_key]
-          when Array
-            decorators[decorators_key]
-          when NilClass
-            []
-          else
-            [decorators[decorators_key]]
-        end .each do |decorator|
-          entity.extend decorator
-          entity.mandatory_properties.concat decorator.mandatory_properties if decorator.respond_to? :mandatory_properties
-          logger.debug "Decorated entity '#{entity.name}' with '#{decorator}'"
-        end
-      end
-    end
 
   end
 
