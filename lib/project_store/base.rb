@@ -33,6 +33,7 @@ module ProjectStore
                 logger.debug "Loading '#{entity_name}' entity."
                 entity = store[entity_name]
                 decorate_and_index_entity entity_name, entity, store
+                yield entity if block_given?
               rescue => e
                 if continue_on_error
                   logger.error "Invalid entity of type '#{entity_name}' in file '#{file}'"
