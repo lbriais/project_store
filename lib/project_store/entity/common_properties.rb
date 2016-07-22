@@ -5,7 +5,12 @@ module ProjectStore
 
       extend ProjectStore::Entity::PropertyBinder
 
-      yaml_accessor :description, :data
+      yaml_accessor :description
+      yaml_writer :data
+
+      def data
+        self[:data] || {}
+      end
 
     end
 
