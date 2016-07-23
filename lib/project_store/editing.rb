@@ -8,7 +8,7 @@ module ProjectStore
     attr_writer :editor
 
     def editor
-      @editor ||= ENV['EDITOR']
+      @editor ||= ENV['DM_EDITOR']
     end
 
     def edit(file_or_entity)
