@@ -24,7 +24,7 @@ module ProjectStore
                 when ProjectStore::Entity::Base
                   file_or_entity.backing_store.path
               end
-      tmp_file = Tempfile.new(self.class.name).path
+      tmp_file = Tempfile.new([self.class.name, '.yaml']).path
       begin
         FileUtils.copy file, tmp_file
         edit_file tmp_file, &block
