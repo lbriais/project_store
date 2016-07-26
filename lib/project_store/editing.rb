@@ -5,13 +5,15 @@ module ProjectStore
 
   module Editing
 
+    EDITOR_ENVIRONMENT_VARIABLE = 'DM_EDITOR'
+
     attr_writer :editor
 
     def editor
-      @editor ||= ENV['DM_EDITOR']
+      @editor ||= ENV[EDITOR_ENVIRONMENT_VARIABLE]
     end
 
-    def edit(file_or_entity)
+    def edit(file_or_entity, &block)
       file =  case file_or_entity
                 when String
                   if File.exists? file_or_entity and File.readable? file_or_entity
@@ -25,7 +27,7 @@ module ProjectStore
       tmp_file = Tempfile.new(self.class.name).path
       begin
         FileUtils.copy file, tmp_file
-        edit_file tmp_file
+        edit_file tmp_file, &block
         begin
           store = YAML::Store.new(tmp_file)
           store.transaction do
@@ -51,7 +53,11 @@ module ProjectStore
     def edit_file(file)
       raise PSE, 'No editor specified' if editor.nil?
       logger.debug "Editing file '#{file}', using editor '#{editor}'"
-      `"#{editor}" "#{file}"`
+      if block_given?
+        yield editor, file
+      else
+        system "#{editor} '#{file}'"
+      end
     end
 
 
