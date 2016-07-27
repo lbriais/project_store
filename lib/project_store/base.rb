@@ -36,11 +36,11 @@ module ProjectStore
                 decorate_and_index_entity entity_name, entity, store
               rescue => e
                 if continue_on_error
-                  logger.error "Invalid entity of type '#{entity_name}' in file '#{file}'"
+                  logger.error "Invalid entity '#{entity_name}' in file '#{file}'"
                   logger.debug "#{e.message}\nBacktrace:\n#{e.backtrace.join("\n\t")}"
                 else
                   logger.debug "#{e.message}\nBacktrace:\n#{e.backtrace.join("\n\t")}"
-                  raise PSE, "Invalid entity of type '#{entity_name}' in file '#{file}'"
+                  raise PSE, "Invalid entity '#{entity_name}' in file '#{file}'"
                 end
               end
             end
