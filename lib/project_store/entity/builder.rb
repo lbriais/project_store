@@ -13,6 +13,7 @@ module ProjectStore
         ProjectStore.logger.info "New entity '#{entity.name}' of type '#{entity.type}'."
         # Adds extra decorator
         add_decorators entity
+        yield entity if block_given?
         entity
       end
 

@@ -21,7 +21,7 @@ module ProjectStore
       self.decorators = {}
     end
 
-    def load_entities
+    def load_entities(&block)
       Dir.glob(File.join(path, '*.yaml')).each do |file|
         logger.debug "Found store file '#{file}'"
         begin
@@ -32,15 +32,14 @@ module ProjectStore
               begin
                 logger.debug "Loading '#{entity_name}' entity."
                 entity = store[entity_name]
-                yield entity if block_given?
-                decorate_and_index_entity entity_name, entity, store
+                decorate_and_index_entity entity_name, entity, store, &block
               rescue => e
                 if continue_on_error
-                  logger.error "Invalid entity '#{entity_name}' in file '#{file}'"
+                  logger.warn "Invalid entity '#{entity_name}' in file '#{file}'"
                   logger.debug "#{e.message}\nBacktrace:\n#{e.backtrace.join("\n\t")}"
                 else
                   logger.debug "#{e.message}\nBacktrace:\n#{e.backtrace.join("\n\t")}"
-                  raise PSE, "Invalid entity '#{entity_name}' in file '#{file}'"
+                  raise PSE, "Invalid entity '#{entity_name}' in file '#{file}' (#{e.message})"
                 end
               end
             end
@@ -60,10 +59,10 @@ module ProjectStore
       Dir.exist? path and File.readable? path and File.writable? path
     end
 
-    def decorate_and_index_entity(entity_name, entity, store)
-      setup_entity! entity_name, entity
+    def decorate_and_index_entity(entity_name, entity, store, &block)
+      setup_entity! entity_name, entity, &block
       # Re-check the validity of the object now that it has been decorated
-      entity.valid?(raise_exception: true)
+      entity.valid_to_load?(raise_exception: true)
       index_entity(entity, store)
     end
 
