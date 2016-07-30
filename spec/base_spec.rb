@@ -11,7 +11,7 @@ describe ProjectStore::Base do
     o
   end
 
-  it 'should load all object from all stores' do
+  it 'should load all object from all files' do
     expect(subject.project_entities.keys.size).to eq 3
   end
 
@@ -19,8 +19,8 @@ describe ProjectStore::Base do
     expect(subject.entity_types.keys.size).to eq 2
   end
 
-  it 'should index objects by stores' do
-    expect(subject.stores.keys.size).to eq 2
+  it 'should index objects by files' do
+    expect(subject.files.keys.size).to eq 2
   end
 
   it 'should allow to save any entity' do
@@ -41,7 +41,7 @@ describe ProjectStore::Base do
 
   end
 
-  context 'when the stores contain duplicated objects' do
+  context 'when the files contain duplicated objects' do
 
     let(:store_path) { File.expand_path '../../test/store2', __FILE__ }
     subject {described_class.new store_path}

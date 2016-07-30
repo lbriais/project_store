@@ -8,7 +8,7 @@ module ProjectStore
     include ProjectStore::Editing
 
     attr_accessor :continue_on_error
-    attr_reader :path, :project_entities, :entity_types, :stores, :logger
+    attr_reader :path, :project_entities, :entity_types, :files, :logger
 
     def initialize(path)
       raise PSE, "Invalid store path '#{path}'!" unless valid_path? path
@@ -16,7 +16,7 @@ module ProjectStore
       @path = File.expand_path path
       self.continue_on_error = false
       @project_entities = {}
-      @stores = {}
+      @files = {}
       @entity_types = {}
       self.decorators = {}
     end
@@ -26,7 +26,7 @@ module ProjectStore
         logger.debug "Found store file '#{file}'"
         begin
           store = YAML::Store.new(file)
-          stores[store] ||= []
+          files[store] ||= []
           store.transaction(true) do
             store.roots.each do |entity_name|
               begin
@@ -34,12 +34,14 @@ module ProjectStore
                 entity = store[entity_name]
                 decorate_and_index_entity entity_name, entity, store, &block
               rescue => e
+                msg = "Invalid entity '#{entity_name}' in file '#{file}' (#{e.message})"
+                dbg_msg = "#{e.message}\nBacktrace:\n#{e.backtrace.join("\n\t")}"
                 if continue_on_error
-                  logger.warn "Invalid entity '#{entity_name}' in file '#{file}'"
-                  logger.debug "#{e.message}\nBacktrace:\n#{e.backtrace.join("\n\t")}"
+                  logger.warn msg
+                  logger.debug dbg_msg
                 else
-                  logger.debug "#{e.message}\nBacktrace:\n#{e.backtrace.join("\n\t")}"
-                  raise PSE, "Invalid entity '#{entity_name}' in file '#{file}' (#{e.message})"
+                  logger.debug dbg_msg
+                  raise PSE, msg
                 end
               end
             end
@@ -54,6 +56,10 @@ module ProjectStore
 
 
     private
+
+    def reset
+      [project_entities, files, entity_types].each { |list| list.clear}
+    end
 
     def valid_path?(path)
       Dir.exist? path and File.readable? path and File.writable? path
@@ -70,13 +76,14 @@ module ProjectStore
       entity.backing_store = store
       raise PSE, "Entity '#{entity.name}' already defined in file '#{project_entities[entity.name].backing_store.path}'" if project_entities[entity.name]
       # Add to the store index store -> entity list
-      stores[store] << entity
+      files[store] << entity
       # Add to main hash entity name -> entity
       project_entities[entity.name] = entity
       # Add to type hash  entity type -> entity list
       entity_types[entity.type] ||= []
       entity_types[entity.type] << entity
     end
+
 
 
   end
