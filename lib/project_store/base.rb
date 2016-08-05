@@ -21,6 +21,12 @@ module ProjectStore
       self.decorators = {}
     end
 
+    def clear
+      @project_entities = {}
+      @files = {}
+      @entity_types = {}
+    end
+
     def load_entities(&block)
       Dir.glob(File.join(path, '*.yaml')).each do |file|
         logger.debug "Found store file '#{file}'"
