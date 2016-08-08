@@ -52,6 +52,10 @@ module ProjectStore
         true
       end
 
+      def valid?(raise_exception: false)
+        valid_to_save? raise_exception
+      end
+
       def mandatory_properties
         @mandatory_properties ||= [:type]
       end
