@@ -53,7 +53,7 @@ module ProjectStore
       end
 
       def valid?(raise_exception: false)
-        valid_to_save? raise_exception
+        valid_to_save? raise_exception: raise_exception
       end
 
       def mandatory_properties
