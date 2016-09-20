@@ -27,6 +27,27 @@ module ProjectStore
       @entity_types = {}
     end
 
+    def create(entity_name, entity_content = {}, entity_type = nil, &block)
+      raise PSE, "Entity '#{entity_name}' already exists !" if project_entities[entity_name]
+      entity_type ||= entity_content[:type]
+      entity_content[:type] = entity_type
+      store_file = File.join path, "#{entity_type}.yaml"
+      candidate_stores = files.keys.select do |store|
+        store.path == store_file
+      end
+      raise PSE, 'Oops something went really wrong' if candidate_stores.size > 1
+      target_store = candidate_stores.empty? ? YAML::Store.new(store_file) : candidate_stores.first
+      files[target_store] ||= []
+      decorate_and_index_entity entity_name, entity_content, target_store, &block
+    end
+
+    def delete(entity)
+      files[entity.backing_store].delete entity
+      project_entities.delete entity.name
+      entity_types[entity.type].delete entity
+      entity.delete!
+    end
+
     def load_entities(&block)
       Dir.glob(File.join(path, '*.yaml')).each do |file|
         logger.debug "Found store file '#{file}'"
@@ -76,6 +97,7 @@ module ProjectStore
       # Re-check the validity of the object now that it has been decorated
       entity.valid_to_load?(raise_exception: true)
       index_entity(entity, store)
+      entity
     end
 
     def index_entity(entity, store)

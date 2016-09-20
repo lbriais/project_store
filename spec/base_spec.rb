@@ -1,4 +1,6 @@
 require 'spec_helper'
+require 'tmpdir'
+require 'fileutils'
 
 describe ProjectStore::Base do
 
@@ -57,6 +59,28 @@ describe ProjectStore::Base do
 
   end
 
+
+  context 'when managing objects' do
+
+    before(:all) {@dir = Dir.mktmpdir 'project_store'}
+    after(:all) { FileUtils.remove_entry @dir }
+
+    let(:correct_entity_content) { {type: :stupid} }
+
+    subject do
+      described_class.new @dir
+    end
+
+    it 'should allow to delete objects' do
+      entity = subject.create :foo, correct_entity_content
+      expect(subject.project_entities.values.first).to eq entity
+      expect { entity.save }.not_to raise_error
+      expect(File.exists? entity.backing_store.path).to be_truthy
+      expect { subject.delete entity }.not_to raise_error
+      expect(subject.project_entities.values).to be_empty
+    end
+
+  end
 
 
 end

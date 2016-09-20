@@ -24,6 +24,17 @@ module ProjectStore
         end
       end
 
+      def delete!
+        if backing_store.nil?
+          ProjectStore.logger.warn "No backing store specified for '#{name}'. Not saved!"
+          return false
+        end
+        ProjectStore.logger.debug "Deleting '#{name}' from '#{backing_store.path}'"
+        backing_store.transaction do
+          backing_store.delete name
+        end
+      end
+
       def valid_to_load?(raise_exception: false)
         mandatory_properties.each do |mandatory_property|
           unless self[mandatory_property]
