@@ -36,6 +36,39 @@ describe ProjectStore::Editing do
       allow(subject).to receive(:edit_file)
       expect {subject.edit subject.project_entities.values.first.backing_store.path}.not_to raise_error
     end
+
+    context 'when the edited object becomes invalid' do
+
+      let(:invalid_file) {File.expand_path '../../test/invalid_objects.yaml', __FILE__}
+
+      it 'should issue an error' do
+        count = 0
+        allow(subject).to receive(:edit_file) do |tmp_file_in_use|
+          FileUtils.copy invalid_file, tmp_file_in_use
+          count += 1
+        end
+        expect {subject.edit subject.project_entities.values.first.backing_store.path}.to raise_error
+        expect(count).to eq 1
+      end
+
+      context 'when a retry amount is set' do
+
+        it 'should allow to retry editing' do
+          subject.nb_max_edit_retries = 2
+          count = 0
+          allow(subject).to receive(:edit_file) do |tmp_file_in_use|
+            FileUtils.copy invalid_file, tmp_file_in_use
+            count += 1
+          end
+          expect {subject.edit subject.project_entities.values.first.backing_store.path}.to raise_error
+          expect(count).to eq subject.nb_max_edit_retries
+        end
+
+      end
+
+    end
+
+
   end
 
 
